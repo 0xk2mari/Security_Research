@@ -157,6 +157,7 @@ void compared(int ret)
 
 void plain(char message0[321], int message1[2560], int blocks[40][64])
 {
+   SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 6);
    printf("\n >> Now, Enter your message in 320 characters!");
    printf("\n    If you have completed the input, please press the [ Enter key ].");
    printf("\n : ");
