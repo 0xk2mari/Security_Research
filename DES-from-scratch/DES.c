@@ -20,7 +20,7 @@ void left_rotate_1(int A[28]);
 void shift(int C[28], int D[28], int round);
 void CD1(int C[28], int D[28], int CD[56]);
 void PC2(const int pc2[48], int out48[48], int CD[56]);
-const int shift_table[17] = { 0, 1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1 };
+const int shift_table[16] = { 0, 1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1 };
 
 
 
@@ -89,7 +89,7 @@ int main()
         21, 13, 5, 28, 20, 12, 4
     };
     int round = 0;
-    int round_key[17][48];
+    int roundkey[16][48];
     int C[28];
     int D[28];
     int CD[56];
@@ -116,10 +116,13 @@ int main()
     makekey64(key, key64);
     PC1(pc1, pc1table, key64);
     devideCD(C, D, pc1table);
-    shift(C, D, round);
-    CD1(C, D, CD);
-    PC2(pc2, out48, CD);
-
+    
+    for (int round = 0; round < 16; round++) 
+    {
+        shift(C, D, round);
+        CD1(C, D, CD);
+        PC2(pc2, roundkey[round], CD);
+    }
 }
 
 
@@ -299,7 +302,9 @@ void left_rotate_1(int A[28])
 {
     int temp = A[0];
     for (int i = 0; i < 27; i++)
+    {
         A[i] = A[i + 1];
+    }
     A[27] = temp;
 }
 
