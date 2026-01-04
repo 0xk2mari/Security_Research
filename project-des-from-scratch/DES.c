@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NOT_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
@@ -20,7 +20,7 @@ void left_rotate_1(int A[28]);
 void shift(int C[28], int D[28], int round);
 void CD1(int C[28], int D[28], int CD[56]);
 void PC2(const int pc2[48], int out48[48], int CD[56]);
-const int shift_table[16] = { 0, 1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1 };
+const int shift_table[16] = { 1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1 };
 void F(const int R[32], const int roundkey[48], int out32[32], const int Etable[48], const int Ptable[32], const int SBOX[8][4][16]);
 static void xor48(const int a[48], const int b[48], int out[48]); 
 static void pbox32(const int in32[32], int out32[32], const int Ptable[32]);
@@ -29,6 +29,65 @@ static void sboxes_48_to_32(const int in48[48], int out32[32], const int SBOX[8]
 static void xor32(const int AA[32], const int BB[32], int outout[32]);
 void one_round(const int L[32], const int R[32], const int roundKey[48], int newL[32], int newR[32], const int Etable[48], const int Ptable[32], const int SBOX[8][4][16]);
 //---
+const int Ptable[32] = 
+{
+    16,7,20,21,29,12,28,17,
+    1,15,23,26,5,18,31,10,
+    2,8,24,14,32,27,3,9,
+    19,13,30,6,22,11,4,25
+};
+
+const int SBOX[8][4][16] = 
+{
+    { // S1
+        {14,4,13,1,2,15,11,8,3,10,6,12,5,9,0,7},
+        {0,15,7,4,14,2,13,1,10,6,12,11,9,5,3,8},
+        {4,1,14,8,13,6,2,11,15,12,9,7,3,10,5,0},
+        {15,12,8,2,4,9,1,7,5,11,3,14,10,0,6,13}
+    },
+    { // S2
+        {15,1,8,14,6,11,3,4,9,7,2,13,12,0,5,10},
+        {3,13,4,7,15,2,8,14,12,0,1,10,6,9,11,5},
+        {0,14,7,11,10,4,13,1,5,8,12,6,9,3,2,15},
+        {13,8,10,1,3,15,4,2,11,6,7,12,0,5,14,9}
+    },
+    { // S3
+        {10,0,9,14,6,3,15,5,1,13,12,7,11,4,2,8},
+        {13,7,0,9,3,4,6,10,2,8,5,14,12,11,15,1},
+        {13,6,4,9,8,15,3,0,11,1,2,12,5,10,14,7},
+        {1,10,13,0,6,9,8,7,4,15,14,3,11,5,2,12}
+    },
+    { // S4
+        {7,13,14,3,0,6,9,10,1,2,8,5,11,12,4,15},
+        {13,8,11,5,6,15,0,3,4,7,2,12,1,10,14,9},
+        {10,6,9,0,12,11,7,13,15,1,3,14,5,2,8,4},
+        {3,15,0,6,10,1,13,8,9,4,5,11,12,7,2,14}
+    },
+    { // S5
+        {2,12,4,1,7,10,11,6,8,5,3,15,13,0,14,9},
+        {14,11,2,12,4,7,13,1,5,0,15,10,3,9,8,6},
+        {4,2,1,11,10,13,7,8,15,9,12,5,6,3,0,14},
+        {11,8,12,7,1,14,2,13,6,15,0,9,10,4,5,3}
+    },
+    { // S6
+        {12,1,10,15,9,2,6,8,0,13,3,4,14,7,5,11},
+        {10,15,4,2,7,12,9,5,6,1,13,14,0,11,3,8},
+        {9,14,15,5,2,8,12,3,7,0,4,10,1,13,11,6},
+        {4,3,2,12,9,5,15,10,11,14,1,7,6,0,8,13}
+    },
+    { // S7
+        {4,11,2,14,15,0,8,13,3,12,9,7,5,10,6,1},
+        {13,0,11,7,4,9,1,10,14,3,5,12,2,15,8,6},
+        {1,4,11,13,12,3,7,14,10,15,6,8,0,5,9,2},
+        {6,11,13,8,1,4,10,7,9,5,0,15,14,2,3,12}
+    },
+    { // S8
+        {13,2,8,4,6,15,11,1,10,9,3,14,5,0,12,7},
+        {1,15,13,8,10,3,7,4,12,5,6,11,0,14,9,2},
+        {7,11,4,1,9,12,14,2,0,6,10,13,15,3,5,8},
+        {2,1,14,7,4,10,8,13,15,12,9,0,3,5,6,11}
+    }
+};
 
 int main()
 {
@@ -44,118 +103,95 @@ int main()
     char pass0[6];
     char pass1[6];
     int ret = password(pass0, pass1);
-    char message0[301];
-    int message1[2560];
-    int blocks[40][64];
-    const int ip[64] =
-    {
-        58, 50, 42, 34, 26, 18, 10, 2,
-        60, 52, 44, 36, 28, 20, 12, 4,
-        62, 54, 46, 38, 30, 22, 14, 6,
-        64, 56, 48, 40, 32, 24, 16, 8,
-        57, 49, 41, 33, 25, 17, 9, 1,
-        59, 51, 43, 35, 27, 19, 11, 3,
-        61, 53, 45, 37, 29, 21, 13, 5,
-        63, 55, 47, 39, 31, 23, 15, 7
-    };
-    const int input[40][64];
-    int output[40][64];
-    int L[40][32];
-    int R[40][32];
-    const int Etable[48] =
-    {
-        32, 1, 2, 3, 4, 5,
-        4, 5, 6, 7, 8, 9,
-        8, 9, 10, 11, 12, 13,
-        12, 13, 14, 15, 16, 17,
-        16, 17, 18, 19, 20, 21,
-        20, 21, 22, 23, 24, 25,
-        24, 25, 26, 27, 28, 29,
-        28, 29, 30, 31, 32, 1
-    };
-    int EBOX[40][48];
-    unsigned char key[8] =
-    {
-        0x13, 0x34, 0x57, 0x79,
-        0x9B, 0xBC, 0xDF, 0xF1
-    };
-    int key64[64];
-    int pc1table[56];
-    const int pc1[56] =
-    {
-        57, 49, 41, 33, 25, 17, 9,
-        1, 58, 50, 42, 34, 26, 18,
-        10, 2, 59, 51, 43, 35, 27,
-        19, 11, 3, 60, 52, 44, 36,
-        63, 55, 47, 39, 31, 23, 15,
-        7, 62, 54, 46, 38, 30, 22,
-        14, 6, 61, 53, 45, 37, 29,
-        21, 13, 5, 28, 20, 12, 4
-    };
-    int round = 0;
-    int roundkey[16][48];
-    int C[28];
-    int D[28];
-    int CD[56];
-    int out48[48];
-    const int pc2[48] =
-    {
-        14, 17, 11, 24, 1, 5,
-        3, 28, 15, 6, 21, 10,
-        23, 19, 12, 4, 26, 8,
-        16, 7, 27, 20, 13, 2,
-        41, 52, 31, 37, 47, 55,
-        30, 40, 51, 45, 33, 48,
-        44, 49, 39, 56, 34, 53,
-        46, 42, 50, 36, 29, 32
-    };
-    int out32[32];
-    const int Ptable[32];
-    const int SBOX[8][4][16];
-    const int a[48];
-    const int b[48];
-    int out[48];
-    const int in32[32];
-    int out32[32];
-    const int six[6];
-    const int S[4][16]; 
-    int out4[4];
-    const int in48[48];
-    const int AA[32];
-    const int BB[32];
-    int outout[32];
-    int newL[32];
-    int newR[32];
-
-
     compared(ret);
+    char message0[301];
+    int message1[2560] = {0};
+    int blocks[40][64] = {0};
     plain(message0, message1, blocks);
-    IP(input, output, ip);
+
+    // --- IP
+    const int ip[64] = 
+    {
+        58,50,42,34,26,18,10,2, 
+        60,52,44,36,28,20,12,4,
+        62,54,46,38,30,22,14,6, 
+        64,56,48,40,32,24,16,8,
+        57,49,41,33,25,17,9,1,  
+        59,51,43,35,27,19,11,3,
+        61,53,45,37,29,21,13,5,    
+        63,55,47,39,31,23,15,7
+    };
+
+    int output[40][64] = {0};
+    int L[40][32] = {0};
+    int R[40][32] = {0};
+
+    IP(blocks, output, ip);
     divide(output, L, R);
-    ebox(R, EBOX, Etable);
+
+    // --- key schedule (표준 테스트 키)
+    unsigned char key[8] = { 0x13,0x34,0x57,0x79, 0x9B,0xBC,0xDF,0xF1 };
+    int key64[64] = {0};
+    int pc1table[56] = {0};
+    int C[28] = {0};
+    int D[28] = {0};
+    int CD[56] = {0};
+    int roundkey[16][48] = {0};
+
+    const int pc1[56] = 
+    {
+        57,49,41,33,25,17,9, 
+        1,58,50,42,34,26,18,
+        10,2,59,51,43,35,27,
+        19,11,3,60,52,44,36,
+        63,55,47,39,31,23,15,
+        7,62,54,46,38,30,22,
+        14,6,61,53,45,37,29,
+        21,13,5,28,20,12,4
+    };
+
+    const int pc2[48] = 
+    {
+        14,17,11,24,1,5, 
+        3,28,15,6,21,10,
+        23,19,12,4,26,8, 
+        16,7,27,20,13,2,
+        41,52,31,37,47,55, 
+        30,40,51,45,33,48,
+        44,49,39,56,34,53, 
+        46,42,50,36,29,32
+    };
+
     makekey64(key, key64);
     PC1(pc1, pc1table, key64);
     devideCD(C, D, pc1table);
-    
-    for (int round = 0; round < 16; round++) 
+
+    for (int r = 0; r < 16; r++) 
     {
-        shift(C, D, round);
+        shift(C, D, r);
         CD1(C, D, CD);
-        PC2(pc2, roundkey[round], CD);
+        PC2(pc2, roundkey[r], CD);
     }
 
-    left_rotate_1(A);
-    shift(C, D, round);
-    CD1(C, D, CD);
-    PC2(pc2, out48, CD);
-    F(R, roundkey, out32, Etable, Ptable, SBOX);
-    xor48(a, b, out);
-    pbox32(in32, out32, Ptable);
-    sbox_6_to_4(six, S, out4);
-    sboxes_48_to_32(in48, out32, SBOX);
-    xor32(AA, BB, outout);
-    one_round(L, R, roundkey, newL, newR, Etable, Ptable, SBOX);
+    // --- one round (블록 0만 검사)
+    const int Etable[48] = 
+    {
+        32,1,2,3,4,5, 
+        4,5,6,7,8,9, 
+        8,9,10,11,12,13,
+        12,13,14,15,16,17, 
+        16,17,18,19,20,21, 
+        20,21,22,23,24,25,
+        24,25,26,27,28,29, 
+        28,29,30,31,32,1
+    };
 
+    int newL[32] = {0};
+    int newR[32] = {0};
+    one_round(L[0], R[0], roundkey[0], newL, newR, Etable, Ptable, SBOX);
+
+
+    return 0;
 }
 
 
@@ -448,12 +484,12 @@ void F(const int R[32], const int roundkey[48], int out32[32], const int Etable[
 
 static void xor32(const int AA[32], const int BB[32], int outout[32])
 {
-   for (int i = 0; i < 32; i++)
-   {
-       outout[i] = AA[i] ^ BB[i];
-   }
-            
+    for (int i = 0; i < 32; i++)
+        {
+            outout[i] = AA[i] ^ BB[i];
+        }
 }
+
 
 void one_round(const int L[32], const int R[32], const int roundkey[48], int newL[32], int newR[32], const int Etable[48], const int Ptable[32], const int SBOX[8][4][16])
 {
