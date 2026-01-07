@@ -206,12 +206,12 @@ int main(void)
     {
         int in64[64] = { 0 };
         for (int i = 0; i < 64; i++)
-            in64[i] = blocks[b][i];
-
-        unsigned long long ct =
-            des_encrypt_block_bits(in64, ip, fp, Etable, Ptable, SBOX, roundkey2);
-
-        printf("%016llX", ct);
+			{
+            	in64[i] = blocks[b][i];
+			}
+    
+		unsigned long long ct = des_encrypt_block_bits(in64, ip, fp, Etable, Ptable, SBOX, roundkey2);
+		printf("%016llX", ct);
     }
     printf("\n");
 
@@ -309,7 +309,6 @@ void plain(char message0[301], int message1[2560], int blocks[40][64], int* nblo
     for (int j = 0; j < totalLen; j++) // 블록(암호화 단위)나누는 코드. 
     {
         unsigned char c = message0[j]; // 전체 입력받은 문자열을 unsigned형으로 바꿔서 1글자당 8비트(2진수. 00100010 같은)로 만들어서 계산 본격적으로 들어감
-
         for (int i = 7; i >= 0; i--)
         {
             message1[idx++] = (c >> i) & 1; // 위에서 2진수로 만들어 놓은 문자열을 하나씩 2560칸 안에 집어넣기. 그리고 비트 번호의 홀수/짝수 판별용으로 & 1 쳐서 LSB(오른쪽 맨 마지막 비트) 만 남김. 비트 하나=LSB 하나
@@ -532,19 +531,26 @@ unsigned long long des_encrypt_block_bits(const int in64[64], const int ip[64], 
 {
     int perm[64] = { 0 };
     for (int i = 0; i < 64; i++)
+	{
         perm[i] = in64[ip[i] - 1];
-
+	}
     // 2) divide
-    int Lcur[32] = { 0 }, Rcur[32] = { 0 }, newL[32] = { 0 }, newR[32] = { 0 };
-    for (int i = 0; i < 32; i++) {
+    int Lcur[32] = { 0 };
+	Rcur[32] = { 0 };
+	newL[32] = { 0 };
+	newR[32] = { 0 };
+    for (int i = 0; i < 32; i++) 
+	{
         Lcur[i] = perm[i];
         Rcur[i] = perm[i + 32];
     }
 
     // 3) 16 rounds
-    for (int r = 0; r < 16; r++) {
+    for (int r = 0; r < 16; r++) 
+	{
         one_round(Lcur, Rcur, roundkey2[r], newL, newR, Etable, Ptable, SBOX);
-        for (int i = 0; i < 32; i++) {
+        for (int i = 0; i < 32; i++) 
+		{
             Lcur[i] = newL[i];
             Rcur[i] = newR[i];
         }
@@ -552,14 +558,16 @@ unsigned long long des_encrypt_block_bits(const int in64[64], const int ip[64], 
 
     // 4) swap
     int preout[64] = { 0 };
-    for (int i = 0; i < 32; i++) {
+    for (int i = 0; i < 32; i++) 
+	{
         preout[i] = Rcur[i];
         preout[i + 32] = Lcur[i];
     }
 
     // 5) FP + pack to u64
     unsigned long long out = 0;
-    for (int i = 0; i < 64; i++) {
+    for (int i = 0; i < 64; i++) 
+	{
         int bit = preout[fp[i] - 1] & 1;
         out = (out << 1) | (unsigned long long)bit;
     }
