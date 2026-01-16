@@ -55,7 +55,7 @@ int main(void)
     int nblocks = 0;
     plain(message0, message1, blocks, &nblocks);
 
-    // ===================== DES TABLES =====================
+    // ===================== DES 테이블 =====================
 
     const int ip[64] =
     {
@@ -153,7 +153,7 @@ int main(void)
         }
     };
 
-    // --- key schedule tables
+    // --- key schedule 테이블블
     const int pc1[56] =
     {
         57,49,41,33,25,17,9,
