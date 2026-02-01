@@ -42,20 +42,20 @@ int main(void)
     printf("\n\n=========================================================================================");
     printf("\n\n >> Please enter a 5-character password : ");
 
-    // --- password
+    // --- 비번 
     char pass0[6] = { 0 };
     char pass1[6] = { 0 };
     int ret = password(pass0, pass1);
     compared(ret);
 
-    // --- plaintext -> bits -> blocks[40][64]
+    // 평문 받고 bit단위로 옮기는 데 필요한 변수들
     char message0[301] = { 0 };
     int message1[2560] = { 0 };
     int blocks[40][64] = { 0 };
     int nblocks = 0;
     plain(message0, message1, blocks, &nblocks);
 
-    // ===================== DES 테이블 =====================
+   // --------------------------- 여기서부터 테이블 --------------------------- //
 
     const int ip[64] =
     {
@@ -153,7 +153,7 @@ int main(void)
         }
     };
 
-    // --- key schedule 테이블블
+    // key schedule 테이블
     const int pc1[56] =
     {
         57,49,41,33,25,17,9,
@@ -178,7 +178,8 @@ int main(void)
         46,42,50,36,29,32
     };
 
-    // ===================== KEY SCHEDULE =====================
+// --------------------------- 여기서부터 키 스케줄 --------------------------- //
+	
     unsigned char key[8] = { 0x13,0x34,0x57,0x79, 0x9B,0xBC,0xDF,0xF1 }; // 테스트키
     int key64[64] = { 0 };
     int pc1table[56] = { 0 };
@@ -198,7 +199,8 @@ int main(void)
         PC2(pc2, roundkey2[r], CD);
     }
 
-    // ===================== ENCRYPT ALL BLOCKS =====================
+// --------------------------- 여기서부터 암호화 구역 --------------------------- //
+	
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
     printf("\n >> This is your encrypted message \n : ");
 
@@ -485,16 +487,16 @@ static void sboxes_48_to_32(const int in48[48], int out32[32], const int SBOX[8]
 void F(const int R[32], const int roundkey1[48], int out32[32], const int Etable[48], const int Ptable[32], const int SBOX[8][4][16])
 {
     int ER[48];     // E(R)
-    int X[48];      // ER XOR roundKey
+    int X[48];      // ER XOR 라운드키
     int S_out[32];  // S-box output (32)
     int P_out[32];  // P-box output (32)
 
-    // 1) ER = E(R)  (1-based table)
+    // 1) ER = E(R)  (1-based 테이블)
     for (int j = 0; j < 48; j++)
     {
         ER[j] = R[Etable[j] - 1];
     }
-    // 2) X = ER XOR roundKey
+    // 2) X = ER XOR 라운드키
     xor48(ER, roundkey1, X);
     // 3) S_out = S-boxes(X)
     sboxes_48_to_32(X, S_out, SBOX);
@@ -545,7 +547,7 @@ unsigned long long des_encrypt_block_bits(const int in64[64], const int ip[64], 
         Rcur[i] = perm[i + 32];
     }
 
-    // 3) 16 rounds
+    // 3) 16 라운드
     for (int r = 0; r < 16; r++) 
 	{
         one_round(Lcur, Rcur, roundkey2[r], newL, newR, Etable, Ptable, SBOX);
