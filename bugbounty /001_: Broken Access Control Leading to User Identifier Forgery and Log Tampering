@@ -1,0 +1,75 @@
+[1] Summary
+
+A broken access control vulnerability was identified in a specific service feature.
+The issue allows authenticated users to manipulate user identifiers and modify access log data through client-side request tampering.
+This vulnerability may compromise data integrity and undermine trust in system logging mechanisms.
+
+____
+
+[2] Vulnerability Classification
+
+- Category: Broken Access Control
+- OWASP Top 10: A01:2021 – Broken Access Control
+- Attack Vector: Authenticated user (low privilege)
+- Required Privileges: Standard user account
+
+____
+
+[3] Technical Details
+
+During testing under a normal user account, it was observed that internal service functionality was exposed through client-accessible endpoints.
+The application failed to enforce proper server-side authorization checks when processing sensitive operations involving user identifiers and log data.
+By modifying request parameters using browser developer tools, it was possible to:
+- Forge user identifiers
+- Manipulate access log records
+- Execute sensitive operations without administrative privileges
+
+The application relied on client-supplied values without sufficient validation of user role or ownership.
+
+____
+
+[4] Steps to Reproduce
+
+ 1. Log in using a standard user account.
+ 2. Access the affected feature.
+ 3. Intercept or modify the outgoing request using browser developer tools.
+ 4. Alter the user identifier parameter.
+ 5. Submit the modified request.
+ 6. Observe that the operation succeeds without proper authorization validation.
+
+____
+
+[5] Impact Assessment
+
+Integrity – High
+Unauthorized modification of user identifiers and access logs directly compromises system data integrity.
+
+Confidentiality – Medium to High
+Improper access validation may expose or allow manipulation of sensitive information.
+
+Availability – Medium
+Potential abuse could affect system reliability or service trust.
+
+____
+
+[6] Root Cause
+
+- Exposure of internal service functionality to general users
+- Lack of strict server-side authorization validation
+- Trust in client-side input without proper verification
+
+____
+
+[7] Remediation Recommendations
+
+ 1. Enforce strict server-side role-based access control (RBAC).
+ 2. Validate user ownership and privilege level before processing sensitive operations.
+ 3. Prevent exposure of administrative or internal endpoints to standard users.
+ 4. Implement centralized authorization middleware.
+ 5. Conduct periodic access control audits and penetration testing.
+
+____
+
+[8] Security Reference
+
+OWASP Top 10 – A01:2021: Broken Access Control
