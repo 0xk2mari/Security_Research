@@ -204,6 +204,42 @@ int main(void)
         PC2(pc2, roundkey2[r], CD);
     }
 
+// --------------------------- 비번 재확인 --------------------------- //
+
+	printf("\n >> Please re-enter the password you entered earlier. : ");
+
+	int i = 0;
+	char pass1[6] = { 0 };
+	for (int i = 0; i < 5; i++)
+	{
+		pass1[i] = _getch();
+		printf("*");
+	}
+	pass1[5] = '\0';
+	printf("\n");
+	return strcmp(pass0, pass1);
+
+// --------------------------- 여기서부터 암호화 구역 --------------------------- //
+
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+ 	printf("\n >> This is your encrypted message \n : ");
+    for (int b = 0; b < nblocks; b++)
+    {
+        int in64[64] = { 0 };
+        for (int i = 0; i < 64; i++)
+			{
+            	in64[i] = blocks[b][i];
+			}
+    	unsigned long long ct = des_encrypt_block_bits(in64, ip, fp, Etable, Ptable, SBOX, roundkey2);
+		printf("%016llX", ct);
+    }
+    printf("\n");
+    return 0;
+}
+
+
+// --------------------------- 여기서부터 함수 구역 --------------------------- //
+
 void plain(char message0[301], int message1[2560], int blocks[40][64], int* nblocks)
 {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 6);
@@ -519,41 +555,6 @@ unsigned long long des_encrypt_block_bits(const int in64[64], const int ip[64], 
     }
     
 	return out;
-  
 
-// --------------------------- 비번 재확인 --------------------------- //
-
-	printf("\n >> Please re-enter the password you entered earlier. : ");
-
-	int i = 0;
-	char pass1[6] = { 0 };
-	for (int i = 0; i < 5; i++)
-	{
-		pass1[i] = _getch();
-		printf("*");
-	}
-	pass1[5] = '\0';
-	printf("\n");
-	return strcmp(pass0, pass1);
-
-// --------------------------- 여기서부터 암호화 구역 --------------------------- //
-
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
- 	printf("\n >> This is your encrypted message \n : ");
-    for (int b = 0; b < nblocks; b++)
-    {
-        int in64[64] = { 0 };
-        for (int i = 0; i < 64; i++)
-			{
-            	in64[i] = blocks[b][i];
-			}
-    	unsigned long long ct = des_encrypt_block_bits(in64, ip, fp, Etable, Ptable, SBOX, roundkey2);
-		printf("%016llX", ct);
-    }
-    printf("\n");
-    return 0;
 }
-
-
-// --------------------------- 여기서부터 함수 구역 --------------------------- //
 
