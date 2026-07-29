@@ -40,7 +40,7 @@ int main(void)
     printf("We will now enter the world of cryptography!");
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 3);
     printf("\n\n=========================================================================================");
-    printf("\n\n >> Please enter a 5-character password : ");
+    printf("\n\n >> Please enter a 5-character password, You'll be using this password again later, so make sure to remember it! : ");
 
     // --- 비번 
     char pass0[6] = { 0 };
