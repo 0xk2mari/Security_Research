@@ -7,7 +7,7 @@
 
 //---
 
-int password(char pass0[6]);
+int password_1(char pass0[6]);
 void compared(int ret);
 void plain(char message0[301], int message1[2560], int blocks[40][64], int* nblocks);
 void IP(const int input[40][64], int output[40][64], const int ip[64]);
@@ -29,6 +29,7 @@ static void sboxes_48_to_32(const int in48[48], int out32[32], const int SBOX[8]
 static void xor32(const int AA[32], const int BB[32], int outout[32]);
 void one_round(const int L[32], const int R[32], const int roundkey1[48], int newL[32], int newR[32], const int Etable[48], const int Ptable[32], const int SBOX[8][4][16]);
 unsigned long long des_encrypt_block_bits(const int in64[64], const int ip[64], const int fp[64], const int Etable[48], const int Ptable[32], const int SBOX[8][4][16], const int roundkey2[16][48]);
+int password_2(char pass0[6], char pass1[6]);
 
 
 int main(void)
@@ -42,12 +43,16 @@ int main(void)
     printf("\n\n=========================================================================================");
     printf("\n\n >> Please enter a 5-character password, You'll be using this password again later, so make sure to remember it! : ");
 
-    // --- 비번 
-    char pass0[6] = { 0 };
-    char pass1[6] = { 0 };
-    int ret = password(pass0, pass1);
-    compared(ret);
+  	// --- 비번 입력
+	char pass0[6] = { 0 };
 
+	for (int i = 0; i < 5; i++)
+	{
+		int password_1(char pass0[6]);
+		pass0[i] = _getch();
+		printf("*");
+	}
+    
     // 평문 받고 bit단위로 옮기는 데 필요한 변수들
     char message0[301] = { 0 };
     int message1[2560] = { 0 };
@@ -198,6 +203,21 @@ int main(void)
         CD1(C, D, CD);
         PC2(pc2, roundkey2[r], CD);
     }
+
+// --------------------------- 비번 재확인 --------------------------- //
+
+	printf("\n >> Please re-enter the password you entered earlier. : ");
+
+	int i = 0;
+	char pass1[6] = { 0 };
+	for (int i = 0; i < 5; i++)
+	{
+		pass1[i] = _getch();
+		printf("*");
+	}
+	pass1[5] = '\0';
+	printf("\n");
+	return strcmp(pass0, pass1);
 
 // --------------------------- 여기서부터 암호화 구역 --------------------------- //
 	
