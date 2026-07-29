@@ -7,7 +7,7 @@
 
 //---
 
-int password(char pass0[6], char pass1[6]);
+int password(char pass0[6]);
 void compared(int ret);
 void plain(char message0[301], int message1[2560], int blocks[40][64], int* nblocks);
 void IP(const int input[40][64], int output[40][64], const int ip[64]);
@@ -224,7 +224,7 @@ int main(void)
 // --------------------------- 여기서부터 함수 구역 --------------------------- //
 
 
-int password(char pass0[6], char pass1[6])
+int password(char pass0[6])
 {
     int i = 0;
     for (i = 0; i < 5; i++)
@@ -233,16 +233,6 @@ int password(char pass0[6], char pass1[6])
         printf("*");
     }
     pass0[5] = '\0';
-    printf("\n >> try again!: ");
-
-    for (i = 0; i < 5; i++)
-    {
-        pass1[i] = _getch();
-        printf("*");
-    }
-    pass1[5] = '\0';
-    printf("\n");
-    return strcmp(pass0, pass1);
 }
 
 void compared(int ret)
